@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #define LN 4
 #define TRIES 10
+
+enum guess { no = 0, miss, hit };
 
 int is_in(int haysize, int haystack[haysize], int needle)
 {
@@ -18,49 +21,92 @@ int is_in(int haysize, int haystack[haysize], int needle)
   return 0;
 }
 
+void generate_code(int codelen, int lock[codelen])
+{
+  int i;
+  for(i = 0; i < codelen; ++i)
+  {
+    lock[i] = rand() % 10;
+  }
+}
+
+void prepare_game(int codelen, int tries)
+{
+  printf("Guess %d digit sequence\n", codelen);
+  printf("You have %d attempts\n", tries);
+}
+
+void show_prompt(int tries)
+{
+  printf("[%d] >", tries);
+}
+
+void read_answer(int tries, int codelen, int answer[codelen])
+{
+  int i;
+  show_prompt(tries);
+  for (i = 0; i < codelen; ++i)
+  {
+    scanf("%d", &answer[i]);
+  }
+}
+
+void show_hint(int codelen, enum guess hint[codelen])
+{
+  int i;
+  fputs("Hint: ", stdout);
+  for (i = 0; i < codelen; ++i)
+  {
+    switch(hint[i])
+    {
+      case hit:
+        putchar('!');
+        break;
+      case miss:
+        putchar('?');
+        break;
+      default:
+        putchar('-');
+    }
+  }
+  putchar('\n');
+}
+
 int game(int codelen, int tries)
 {
-  int guess[codelen], entry[codelen], i, j, right = 0;
+  int lock[codelen], answer[codelen], work[codelen], i, j, right = 0;
+  enum guess hint[codelen];
 
-  for(i = 0; i < LN; ++i)
-  {
-    guess[i] = rand() % 10;
-  }
+  generate_code(codelen, lock);
+  prepare_game(codelen, tries);
 
-  printf("Start guessing %d digit sequence:\n", codelen);
   for (j = 0; j < tries; ++j)
   {
-    printf("[%d] >", tries - j);
-    for (i = 0; i < LN; ++i)
-    {
-      scanf("%d", &entry[i]);
-    }
+    memset(hint, no, sizeof(hint));
+    memcpy(work, lock, sizeof(lock));
 
-    printf("Hint: ");
+    read_answer(tries - j, codelen, answer);
     right = 0;
     for (i = 0; i < codelen; ++i)
     {
-      if (guess[i] == entry[i])
+      if (answer[i] == lock[i])
       {
-        printf("!");
+        hint[i] = hit;
+        work[i] = -1;
         ++right;
       }
-      else if (is_in(codelen, guess, entry[i]))
+      else if (is_in(codelen, lock, answer[i]))
       {
-        printf("?");
-      }
-      else
-      {
-        printf("-");
+        hint[i] = miss;
       }
     }
-    printf("\n");
+
+    show_hint(codelen, hint);
     if (right  == codelen)
     {
       return 1;
     }
   }
-  printf("No more tries\n");
   return 0;
 }
 
