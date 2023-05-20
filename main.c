@@ -5,9 +5,22 @@
 #define LN 4
 #define TRIES 10
 
+int is_in(int haysize, int haystack[haysize], int needle)
+{
+  int i;
+  for (i = 0; i < haysize; ++i)
+  {
+    if (needle == haystack[i])
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 int main()
 {
-  int guess[LN], entry[LN], i, j, k, right = 0, fnd = 0;
+  int guess[LN], entry[LN], i, j, right = 0;
   srand(time(NULL));
 
   for(i = 0; i < LN; ++i)
@@ -32,27 +45,18 @@ int main()
       {
         printf("!");
         ++right;
-        continue;
       }
-      fnd = 0;
-      for (k = 0; k < LN; ++k)
-      {
-        if (k == i) continue;
-        if (entry[i] == guess[k])
-        {
-          fnd = 1;
-          break;
-        }
-      }
-      if (fnd == 1)
+      else if (is_in(LN, guess, entry[i]))
       {
         printf("?");
-        continue;
       }
-      printf("-");
+      else
+      {
+        printf("-");
+      }
     }
     printf("\n");
-    if (right == LN)
+    if (right  == LN)
     {
       printf("Brawo!!1ONE\n");
       return 0;
