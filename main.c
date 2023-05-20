@@ -6,7 +6,10 @@
 #define LN 4
 #define TRIES 10
 
-enum guess { no = 0, miss, hit };
+enum guess
+{
+  no = 0, miss, hit
+};
 
 int is_in(int haysize, int haystack[haysize], int needle)
 {
@@ -24,7 +27,7 @@ int is_in(int haysize, int haystack[haysize], int needle)
 void generate_code(int codelen, int lock[codelen])
 {
   int i;
-  for(i = 0; i < codelen; ++i)
+  for (i = 0; i < codelen; ++i)
   {
     lock[i] = rand() % 10;
   }
@@ -57,19 +60,41 @@ void show_hint(int codelen, enum guess hint[codelen])
   fputs("Hint: ", stdout);
   for (i = 0; i < codelen; ++i)
   {
-    switch(hint[i])
+    switch (hint[i])
     {
-      case hit:
-        putchar('!');
-        break;
-      case miss:
-        putchar('?');
-        break;
-      default:
-        putchar('-');
+    case hit:
+      putchar('!');
+      break;
+    case miss:
+      putchar('?');
+      break;
+    default:
+      putchar('-');
     }
   }
   putchar('\n');
+}
+
+int calculate(int codelen, int answer[codelen], int lock[codelen],
+    enum guess hint[codelen])
+{
+  int i, right = 0, work[codelen];
+  memset(hint, no, codelen);
+  memcpy(work, lock, sizeof(int) * codelen);
+  for (i = 0; i < codelen; ++i)
+  {
+    if (answer[i] == lock[i])
+    {
+      hint[i] = hit;
+      work[i] = -1;
+      ++right;
+    }
+    else if (is_in(codelen, lock, answer[i]))
+    {
+      hint[i] = miss;
+    }
+  }
+  return right;
 }
 
 int game(int codelen, int tries)
@@ -82,27 +107,10 @@ int game(int codelen, int tries)
 
   for (j = 0; j < tries; ++j)
   {
-    memset(hint, no, sizeof(hint));
-    memcpy(work, lock, sizeof(lock));
-
     read_answer(tries - j, codelen, answer);
-    right = 0;
-    for (i = 0; i < codelen; ++i)
-    {
-      if (answer[i] == lock[i])
-      {
-        hint[i] = hit;
-        work[i] = -1;
-        ++right;
-      }
-      else if (is_in(codelen, lock, answer[i]))
-      {
-        hint[i] = miss;
-      }
-    }
-
+    right = calculate(codelen, answer, lock, hint);
     show_hint(codelen, hint);
-    if (right  == codelen)
+    if (right == codelen)
     {
       return 1;
     }
@@ -115,10 +123,10 @@ int main()
   srand(time(NULL));
   puts("Codebreaker");
   puts("Open code lock by guessing the sequence of digits");
-  puts("You will get \"hint\" given by your experience. Right numbers "
-       "on right position are marked by !, those who are on wrong position"
-       "are marked by ?. But you have only a number of tries before alarm starts"
-       );
+  puts(
+      "You will get \"hint\" given by your experience. Right numbers "
+          "on right position are marked by !, those who are on wrong position"
+          "are marked by ?. But you have only a number of tries before alarm starts");
   if (game(LN, TRIES))
   {
     puts("CLICK! The lock is open!");
