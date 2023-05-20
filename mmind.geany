@@ -19,7 +19,7 @@ indent_mode=2
 
 [project]
 name=Mmind
-base_path=/home/aria/Projects/mmind/
+base_path=/home/aria/Projects/mmind-lessons
 description=
 file_patterns=*.c;
 
@@ -28,9 +28,20 @@ long_line_behaviour=2
 long_line_column=72
 
 [files]
-current_page=1
-FILE_NAME_0=332;C;0;EUTF-8;0;1;0;%2Fhome%2Faria%2FProjects%2Fmmind%2Fmain.c;0;2
-FILE_NAME_1=14;None;0;EUTF-8;0;1;0;%2Fhome%2Faria%2FProjects%2Fmmind%2F.gitignore;0;2
+current_page=0
+FILE_NAME_0=1028;C;0;EUTF-8;0;1;0;%2Fhome%2Faria%2FProjects%2Fmmind-lessons%2Fmain.c;0;2
 
 [VTE]
-last_dir=/home/aria
+last_dir=/home/aria/Projects/mmind-lessons
+
+[build-menu]
+CFT_00_LB=_Compile
+CFT_00_CM=gcc -Wall -c "%f"
+CFT_00_WD=
+CFT_01_LB=_Build
+CFT_01_CM=gcc -Wall -o "./build/%e" "%f"
+CFT_01_WD=
+filetypes=C;
+EX_00_LB=_Execute
+EX_00_CM="./build/%e"
+EX_00_WD=

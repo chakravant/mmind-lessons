@@ -7,7 +7,7 @@
 
 int main()
 {
-  int guess[LN], entry[LN], i, j, right = 0;
+  int guess[LN], entry[LN], i, j, k, right = 0, fnd = 0;
   srand(time(NULL));
 
   for(i = 0; i < LN; ++i)
@@ -32,26 +32,32 @@ int main()
       {
         printf("!");
         ++right;
-        goto ok;
+        continue;
       }
-      if (guess[0] == entry[i] ||
-          guess[1] == entry[i] ||
-          guess[2] == entry[i] ||
-          guess[3] == entry[i])
+      fnd = 0;
+      for (k = 0; k < LN; ++k)
+      {
+        if (k == i) continue;
+        if (entry[i] == guess[k])
+        {
+          fnd = 1;
+          break;
+        }
+      }
+      if (fnd == 1)
       {
         printf("?");
-        goto ok;
+        continue;
       }
-      printf("_");
-      ok:
+      printf("-");
     }
     printf("\n");
     if (right == LN)
     {
       printf("Brawo!!1ONE\n");
-      goto end;
+      return 0;
     }
   }
   printf("Niestety, koniec prob\n");
-  end: return 0;
+  return 0;
 }
