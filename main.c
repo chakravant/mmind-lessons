@@ -18,20 +18,19 @@ int is_in(int haysize, int haystack[haysize], int needle)
   return 0;
 }
 
-int main()
+int game(int codelen, int tries)
 {
-  int guess[LN], entry[LN], i, j, right = 0;
-  srand(time(NULL));
+  int guess[codelen], entry[codelen], i, j, right = 0;
 
   for(i = 0; i < LN; ++i)
   {
     guess[i] = rand() % 10;
   }
 
-  printf("Zgadnij %d cyfry kodu:\n", LN);
-  for (j = 0; j < TRIES; ++j)
+  printf("Start guessing %d digit sequence:\n", codelen);
+  for (j = 0; j < tries; ++j)
   {
-    printf("[%d] >", j);
+    printf("[%d] >", tries - j);
     for (i = 0; i < LN; ++i)
     {
       scanf("%d", &entry[i]);
@@ -39,14 +38,14 @@ int main()
 
     printf("Hint: ");
     right = 0;
-    for (i = 0; i < LN; ++i)
+    for (i = 0; i < codelen; ++i)
     {
       if (guess[i] == entry[i])
       {
         printf("!");
         ++right;
       }
-      else if (is_in(LN, guess, entry[i]))
+      else if (is_in(codelen, guess, entry[i]))
       {
         printf("?");
       }
@@ -56,12 +55,31 @@ int main()
       }
     }
     printf("\n");
-    if (right  == LN)
+    if (right  == codelen)
     {
-      printf("Brawo!!1ONE\n");
-      return 0;
+      return 1;
     }
   }
-  printf("Niestety, koniec prob\n");
+  printf("No more tries\n");
+  return 0;
+}
+
+int main()
+{
+  srand(time(NULL));
+  puts("Codebreaker");
+  puts("Open code lock by guessing the sequence of digits");
+  puts("You will get \"hint\" given by your experience. Right numbers "
+       "on right position are marked by !, those who are on wrong position"
+       "are marked by ?. But you have only a number of tries before alarm starts"
+       );
+  if (game(LN, TRIES))
+  {
+    puts("CLICK! The lock is open!");
+  }
+  else
+  {
+    puts("BEEP! The alarm starts!");
+  }
   return 0;
 }
