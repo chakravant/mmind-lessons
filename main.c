@@ -18,10 +18,10 @@ int is_in(int haysize, int haystack[haysize], int needle)
   {
     if (needle == haystack[i])
     {
-      return 1;
+      return i;
     }
   }
-  return 0;
+  return -1;
 }
 
 void generate_code(int codelen, int lock[codelen])
@@ -75,31 +75,64 @@ void show_hint(int codelen, enum guess hint[codelen])
   putchar('\n');
 }
 
-int calculate(int codelen, int answer[codelen], int lock[codelen],
-    enum guess hint[codelen])
+int calculate_hits(int codelen, int answer[codelen], int lock[codelen],
+    enum guess hint[codelen], int erase_found)
 {
-  int i, right = 0, work[codelen];
-  memset(hint, no, codelen);
-  memcpy(work, lock, sizeof(int) * codelen);
+  int i, right = 0;
   for (i = 0; i < codelen; ++i)
   {
     if (answer[i] == lock[i])
     {
       hint[i] = hit;
-      work[i] = -1;
       ++right;
+      if (erase_found)
+      {
+        lock[i] = -1;
+      }
     }
-    else if (is_in(codelen, lock, answer[i]))
+    else
     {
-      hint[i] = miss;
+      hint[i] = no;
     }
   }
   return right;
 }
 
+void calculate_miss(int codelen, int answer[codelen], int lock[codelen],
+    enum guess hint[codelen], int erase_found)
+{
+  int i, p;
+  for (i = 0; i < codelen; ++i)
+  {
+    if (hint[i] != hit && (p = is_in(codelen, lock, answer[i])) > -1)
+    {
+      hint[i] = miss;
+      if (erase_found)
+      {
+        lock[p] = -1;
+      }
+    }
+  }
+}
+
+int calculate(int codelen, int answer[codelen], int lock[codelen],
+    enum guess hint[codelen], int erase_found)
+{
+  int work[codelen];
+  memset(hint, no, codelen);
+  memcpy(work, lock, sizeof(int) * codelen);
+  if (calculate_hits(codelen, answer, work, hint, erase_found) == codelen)
+  {
+    return 1;
+  }
+
+  calculate_miss(codelen, answer, work, hint, erase_found > 1);
+  return 0;
+}
+
 int game(int codelen, int tries)
 {
-  int lock[codelen], answer[codelen], work[codelen], i, j, right = 0;
+  int lock[codelen], answer[codelen], j;
   enum guess hint[codelen];
 
   generate_code(codelen, lock);
@@ -108,12 +141,12 @@ int game(int codelen, int tries)
   for (j = 0; j < tries; ++j)
   {
     read_answer(tries - j, codelen, answer);
-    right = calculate(codelen, answer, lock, hint);
-    show_hint(codelen, hint);
-    if (right == codelen)
+    if (calculate(codelen, answer, lock, hint, 0))
     {
       return 1;
     }
+
+    show_hint(codelen, hint);
   }
   return 0;
 }
